@@ -11,7 +11,13 @@
                             <label for="equip_name" class="form-label fw-bold">ชื่ออุปกรณ์</label>
                             <input type="text" class="form-control" id="equip_name" name="equip_name" value="{{ old('equip_name', $equip->equip_name) }}" required>
                         </div>
+                        
+                        <div class="mb-3">
+                <label for="prefix" class="form-label fw-bold">รหัสอุปกรณ์</label>
+                <input type="text" class="form-control" id="prefix" name="prefix"  value="{{ old('prefix',$equip->prefix) }}" placeholder="เช่น RC, BB, ARR" required>
             
+            </div>
+           
             <div class="mb-3 ">
                 <label for="category_id" class="form-label fw-bold" >หมวดหมู่</label>
                 <select name="category_id" id="category_id" class="form-select" required>
@@ -29,6 +35,10 @@
                             <i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง
                         </button>
                     </form>
+            <br>
+                    <a href="{{ route('admin.equip') }}" class="btn btn-secondary fw-bold">
+                            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+            </a>
     </div>
 </div>
 

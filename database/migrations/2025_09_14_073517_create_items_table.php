@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('equip_id')->constrained('equips');
             $table->string('asset_code')->unique();
-            $table->enum('status',['Available','Borrowed','Unavailable','Maintenance','Lost'])->default('Available');
+            $table->enum('status',['Available','Borrowed','Unavailable','Maintenance','Lost','Pending Return'])->default('Available');
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });

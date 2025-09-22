@@ -16,10 +16,13 @@ return new class extends Migration
         Schema::create('equip_loans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('restrict'); // ห้ามลบ user ถ้ายังถูกอ้างอิง
-            $table->foreignId('equip_id')->constrained('equips');
-            $table->integer('quantity');
+            $table->foreignId('item_id')->constrained('items');
+            $table->text('notes')->nullable();
+            $table->timestamp('due_date');
+            $table->timestamp('pending_return_at')->nullable(); // วันที่ member กดแจ้งคืน
+            $table->string('return_photo_path')->nullable(); // ที่อยู่ของไฟล์รูป
+            $table->timestamp('returned_at')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

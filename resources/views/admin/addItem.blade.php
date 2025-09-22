@@ -9,15 +9,24 @@
                 <div class="card-body p-4">
 
                     {{-- ... โค้ดแสดง Error และ Success ... --}}
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
 
                     <form action="{{ route('admin.item-store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="equip_id" class="form-label fw-bold">ประเภทอุปกรณ์</label>
-                            <select name="equip_id" class="form-select" required>
+                            <label for="equip_id" class="form-label fw-bold">อุปกรณ์</label>
+                            <select id="equip_id" name="equip_id" class="form-select" required>
                                 <option value="" selected disabled>-- กรุณาเลือก --</option>
                                 @foreach ($equips as $equip)
-                                    <option value="{{ $equip->id }}">{{ $equip->equip_name }}</option>
+                                    <option value="{{ $equip->id }}" data-prefix="{{ $equip->prefix }}">{{ $equip->equip_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -25,12 +34,8 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="prefix" class="form-label fw-bold">รหัสนำหน้า (Prefix)</label>
-                                <input type="text" name="prefix" class="form-control" placeholder="เช่น RC, BB, ARR" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="start_number" class="form-label fw-bold">เริ่มต้นที่เลข</label>
-                                <input type="number" name="start_number" class="form-control" min="1" value="1" required>
-                            </div>
+                            <input type="text" id="prefix_display" class="form-control" value="{{ $equip->prefix }}" disabled>
+                            
                         </div>
 
                         <div class="row">
@@ -55,4 +60,14 @@
         </div>
     </div>
 </div>
+
+<script>
+    const equipSelected = document.getElementById('equip_id');
+    const prefixDisplay = document.getElementById('prefix_display');
+    equipSelected.addEventListener('change',function(){
+        const selectedOption = this.options[this.selectedIndex];
+        const prefix = selectedOption.getAttribute('data-prefix');
+        prefixDisplay.value = prefix || '--';
+    })
+</script>
 @endsection

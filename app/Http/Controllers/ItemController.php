@@ -11,12 +11,12 @@ use App\Models\Equip;
 class ItemController extends Controller
 {
     //
-    public function index(){
+    public function index(Request $request){
         
         $items = Item::with('equip')->latest()->get();
-        $statuses = Item::STATUS_OPTIONS;
         $equips = Equip::withCount('items')->get();
-        return view('admin.adminItem', ['items' => $items,'statuses'=>$statuses,'equips' => $equips]);
+        $statuses = Item::STATUS_OPTIONS;
+       return view('admin.adminItem', ['items' => $items,'statuses'=>$statuses,'equips' => $equips]);
     }
 
     public function create(){
@@ -29,25 +29,32 @@ class ItemController extends Controller
 {
     $request->validate([
         'equip_id'     => 'required|exists:equips,id',
-        'prefix'       => 'required|string|max:10',
-        'start_number' => 'required|integer|min:1',
+        //'prefix'       => 'required|string|max:10',
         'quantity'     => 'required|integer|min:1',
         'status'       => 'required|in:' . implode(',', array_keys(Item::STATUS_OPTIONS)),
     ]);
 
-    $start = $request->start_number;
-    $end = $start + $request->quantity;
+    $equip = Equip::find($request->equip_id);
+    $prefix = $equip->prefix;
 
-    for ($i = $start; $i < $end; $i++) {
+    $last_item = Item::where('asset_code','LIKE',$prefix .'-%')
+                    ->orderByRaw('CAST(SUBSTRING_INDEX(asset_code, "-", -1) AS UNSIGNED) DESC')
+                    ->first();
+
+    $start_number = 1;
+    if($last_item){
+        $last_number = (int) substr($last_item->asset_code,strrpos($last_item->asset_code, '-') + 1);
+        $start_number = $last_number + 1;
+    }
+    $quantity = $request->quantity;
+    $end_number = $start_number + $quantity;
+
+    for ($i = $start_number; $i < $end_number; $i++) {
         // สร้างรหัสโดยเติม 0 ข้างหน้าให้ครบ 3 หลัก เช่น 001, 002, 010
         $number = str_pad($i, 3, '0', STR_PAD_LEFT);
-        $assetCode = $request->prefix . '-' . $number;
+        $assetCode = $prefix . '-' . $number;
 
-        // ตรวจสอบก่อนว่ารหัสนี้มีคนใช้ไปแล้วหรือยัง
-        if (Item::where('asset_code', $assetCode)->exists()) {
-            // อาจจะ Redirect กลับไปพร้อม Error ว่ารหัสซ้ำ
-            continue; // ข้ามรหัสนี้ไปก่อน (หรือจะให้ดีคือต้องแจ้ง Error)
-        }
+        
 
         Item::create([
             'equip_id'   => $request->equip_id,
@@ -64,6 +71,12 @@ class ItemController extends Controller
     public function edit(Item $item){
         $statuses = Item::STATUS_OPTIONS;
         return view('admin.editItem',['item'=>$item,'statuses'=>$statuses]);
+    }
+
+    public function bulkEdit(){
+        $items = Item::all();
+        $statuses = Item::STATUS_OPTIONS;
+        return view('admin.editBulkItem',compact('items','statuses'));
     }
 
     public function update(Request $request,Item $item)
@@ -94,8 +107,25 @@ class ItemController extends Controller
     $itemIds = $request->input('item_ids');
     $newStatus = $request->input('status');
 
+    $itemsToCheck = \App\Models\Item::whereIn('id', $itemIds)->get();
+
+    // 3. วนลูปเช็คทีละตัวว่ามีสถานะเป็น 'Borrowed' หรือไม่
+    foreach ($itemsToCheck as $item) {
+        if ($item->status === 'Borrowed') {
+            // 4. ถ้าเจอแม้แต่ชิ้นเดียว ให้หยุดทำงานและส่ง Error กลับไปทันที
+            return redirect()->back()->with('error', 'ไม่สามารถแก้ไขสถานะของไอเทมที่ถูกยืมได้ (' . $item->asset_code . ')');
+        }
+    }
+    // --- END: โค้ดป้องกัน ---
+
+
+    // 5. ถ้าตรวจสอบผ่านทั้งหมด (ไม่มีชิ้นไหนถูกยืม) จึงทำการอัปเดต
+    \App\Models\Item::whereIn('id', $itemIds)->update(['status' => $newStatus]);
+
+
+
     // อัปเดตข้อมูลทั้งหมดใน Query เดียว! (มีประสิทธิภาพสูงสุด)
-    Item::whereIn('id', $itemIds)->update(['status' => $newStatus]);
+    //Item::whereIn('id', $itemIds)->update(['status' => $newStatus]);
 
     return redirect()->route('admin.item')->with('success', 'อัปเดตสถานะของไอเทม ' . count($itemIds) . ' ชิ้นเรียบร้อยแล้ว');
 }

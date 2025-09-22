@@ -17,8 +17,8 @@ class MemberDashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $loans = $user->loans()->with('equip')->get();
+        $equipLoans = $user->equipLoans()->with('item.equip')->get();
         $announcements = \App\Models\Announcement::latest()->get();
-        return view('member',['loans'=>$loans,'announcements'=>$announcements]);
+        return view('member',['equipLoans'=>$equipLoans,'announcements'=>$announcements]);
     }
 }

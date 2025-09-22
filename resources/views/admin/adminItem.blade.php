@@ -18,7 +18,7 @@
                     <a href="{{ route('admin.add-item') }}" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i>เพิ่มสต็อก
                     </a>
-                    <a href="{{ route('admin.items.bulk-update') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.items.bulk-edit') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-tags me-2"></i>จัดการรายชิ้น
                     </a>
                 </div>
@@ -62,35 +62,11 @@
 
                                 </div>
                                 
-                                {{-- ส่วน Dropdown จัดการ "ประเภท" อุปกรณ์ (เหมือนเดิม) --}}
-                                <div class="dropdown float-end">
-                                    <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    @foreach($items as $item)
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('admin.edit-item', $item->id) }}">
-                                                <i class="fas fa-edit me-2"></i>แก้ไข
-                                            </a>
-                                        </li>
-                                        <li>
-                                        <form action="{{ route('admin.delete-item', $item->id) }}" method="POST" onsubmit="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบประเภทอุปกรณ์นี้? การกระทำนี้จะลบไอเทมทั้งหมดที่อยู่ภายใต้ประเภทนี้ด้วย!');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="fas fa-trash me-2"></i>ลบประเภท
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                    @endforeach
-                                </div>
-                            </li>
+                              
                         @empty
                             <li class="list-group-item text-center text-muted p-4">
                                 <p>ยังไม่มีประเภทอุปกรณ์ในระบบ</p>
-                                <a href="{{ route('admin.equip.create') }}" class="btn btn-sm btn-primary">สร้างประเภทอุปกรณ์ใหม่</a>
+                                <a href="{{ route('admin.add-equip') }}" class="btn btn-sm btn-primary">สร้างประเภทอุปกรณ์ใหม่</a>
                             </li>
                         @endforelse
                     </ul>

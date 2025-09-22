@@ -12,6 +12,7 @@ class Item extends Model
     public const STATUS_OPTIONS = [
         'Available' => 'พร้อมใช้งาน',
         'Borrowed' => 'ยืมแล้ว',
+        'Pending Return' => 'รอดำเนินการคืน',
         'Unavailable' => 'ไม่พร้อมใช้งาน',
         'Maintenance' => 'ซ่อมบำรุง',
         'Lost' => 'สูญหาย',

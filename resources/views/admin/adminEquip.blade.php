@@ -35,6 +35,10 @@
                                     <div class="small text-muted">
                                         หมวดหมู่ :  {{ $equip->category->name }}
                                     </div>
+
+                                    <div class="small text-muted">
+                                        รหัสอุปกรณ์ :  {{ $equip->prefix }}
+                                    </div>
                                 </div>
                                 
                                 <div class="dropdown float-end">

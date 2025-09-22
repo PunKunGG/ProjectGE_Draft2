@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('equips', function (Blueprint $table) {
             $table->id();
             $table->string('equip_name');
+             $table->string('prefix', 10)->unique(); 
             $table->foreignId('category_id')->constrained('categories');
             $table->foreignId('add_by')->constrained('users')->onDelete('restrict'); // ห้ามลบ user ถ้ายังถูกอ้างอิง
             // FK อ้างอิง user ที่ลบ (nullable เพราะบาง record ยังไม่ถูกลบ)

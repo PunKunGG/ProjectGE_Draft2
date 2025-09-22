@@ -9,21 +9,9 @@ use App\Models\User;
 use App\Models\Item;
 use App\Models\EquipLoan;
 
-class EquipLoanController extends Controller
+class MemberLoanController extends Controller
 {
     //
-    
-
-    public function index(Request $request)
-    {
-        
-        $activeLoans = EquipLoan::whereNull('returned_at')
-                            ->with('user', 'item.equip')
-                            ->latest()
-                            ->get();
-        return view('equipLoan',['equips'=>$activeLoans]);
-    }
-
     public function indexForMember()
 {
     // ดึง ID ของไอเทมทั้งหมดที่ผู้ใช้คนนี้ยืมและยังไม่คืน
@@ -45,21 +33,7 @@ class EquipLoanController extends Controller
     ]);
 }
 
-    public function returnItem(EquipLoan $equipLoan)
-    {
-        $eqipLoan->update(['returned_at'=>now()]);
-        $equipLoan->update(['status'=>'Available']);
-        return redirect()->route('admin.equipLoan.return')->with('success', 'รับคืน ' . $equipLoan->item->asset_code . ' เรียบร้อยแล้ว');
-    }
-
-    public function create()
-    {
-        $availableItems = Item::where('status','Available')->with('equip')->orderBy('asset_code')->get();
-        $users = User::orderBy('name')->get();
-        return view('equipLoan',['items'=>$availableItems,'users'=>$users]);
-    }
-
-    public function store(Request $request)
+public function store(Request $request)
     {
         $request->validate([
             'item_id'=>'required|exists:items,id',
@@ -84,8 +58,7 @@ class EquipLoanController extends Controller
         
         return redirect()->back()->with('success','คุณได้ยืม'.$item->asset_code.' สำเร็จแล้ว');
     }
-
-     public function requestReturn(Request $request, EquipLoan $loan)
+      public function requestReturn(Request $request, EquipLoan $loan)
     {
         // ป้องกันไม่ให้แจ้งคืนของของคนอื่น
         if ($loan->user_id !== auth()->id()) {
@@ -106,31 +79,14 @@ class EquipLoanController extends Controller
         return redirect()->back()->with('success', 'แจ้งคืนอุปกรณ์เรียบร้อย รอกรรมการตรวจสอบ');
     }
 
-    public function pending()
+    public function history()
 {
-    $pendingLoans = EquipLoan::whereNotNull('pending_return_at')
-                             ->whereNull('returned_at')
-                             ->with('user', 'item.equip')
-                             ->get();
+    // ดึงประวัติการยืม "ทั้งหมด" (ทั้งที่คืนแล้วและยังไม่คืน) "เฉพาะของ user ที่ล็อกอินอยู่"
+    $myHistory = auth()->user()->equipLoans()
+                    ->with('item.equip')
+                    ->latest()
+                    ->paginate(15); // ใช้ paginate สำหรับแบ่งหน้า
 
-    return view('admin.pending', ['loans' => $pendingLoans]);
-}
-
-public function confirmReturn(EquipLoan $loan)
-{
-    // 1. อัปเดตรายการยืม: เติมวันที่คืนปัจจุบัน
-    $loan->update(['returned_at' => now()]);
-
-    // 2. อัปเดตสถานะไอเทม: เปลี่ยนจาก 'Pending Return' เป็น 'Available'
-    $loan->item->update(['status' => 'Available']);
-
-    return redirect()->route('admin.loans.pending')->with('success', 'ยืนยันการรับคืน ' . $loan->item->asset_code . ' เรียบร้อยแล้ว');
-}
-
-public function history()
-{
-    $allLoans = EquipLoan::with('user','item.equip')->latest()->paginate(20);// ใช้ paginate เพราะข้อมูลอาจจะเยอะมาก
-    return view('admin.loanHistory',['loans'=>$allLoans]);
-   // return view('admin.loanHistory',['loans'=>$allLoans]);
+    return view('myLoanHistory', ['loans' => $myHistory]);
 }
 }

@@ -57,7 +57,7 @@ class User extends Authenticatable
         return $this->hasMany(Equipment::class, 'remove_by');
     }
 
-    public function loans()
+    public function equipLoans()
     {
         return $this->hasMany(EquipLoan::class, 'user_id');
     }

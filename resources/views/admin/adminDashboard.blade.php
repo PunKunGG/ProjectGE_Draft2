@@ -19,9 +19,11 @@
                     <div class="container p-2 rounded container-user">
                         {{ Auth::user()->studentId }} {{ Auth::user()->name }}
                     </div>
-                    <h3 class="p-2 h-position" >@if (Auth::user()->role == 'admin')
+                    <h3 class="p-2 h-position" >@if (Auth::user()->role == 'super-admin')
+                        <p><strong>ตำแหน่ง :</strong> ประธานชมรม</p>
+                        @elseif (Auth::user()->role == 'admin')
                         <p><strong>ตำแหน่ง :</strong> กรรมการ</p>
-                    @else
+                        @else
                         <p><strong>ตำแหน่ง :</strong> สมาชิกชมรม</p>
                     @endif</h3>
                 </div>
@@ -30,16 +32,19 @@
                 <div class="card-header display-5 fw-bold dashboard-header ms-2 p-2">
                     <h3 class="p-2 h-position">
                         {{-- ตรวจสอบว่ามีการยืมอุปกรณ์หรือไม่ --}}
-            @if(!$loans->isEmpty())
+            @if(!$equipLoans->isEmpty())
                 <div class="card rounded-3 shadow-sm mt-4">
                     <div class="card-body p-4">
                         <p class="h5">
                             <strong>อุปกรณ์ที่ยืม :</strong>
 
                             {{-- วนลูปแสดงรายการอุปกรณ์ที่ยืม --}}
-                            @foreach ($loans as $loan)
-                                {{ $loan->equip->equip_name }} x {{ $loan->quantity }}@if(!$loop->last), @endif
-                            @endforeach
+                            @foreach ($equipLoans as $equipLoan)
+                            <span>{{ $equipLoan->item->equip->equip_name }}</span>
+                                <span class="text-muted">({{ $equipLoan->item->asset_code }})</span>
+
+    @if(!$loop->last), @endif
+@endforeach
                         </p>
                     </div>
                 </div>

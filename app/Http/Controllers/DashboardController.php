@@ -37,9 +37,9 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $loans = $user->loans()->with('equip')->get();
+        $equipLoans = $user->equipLoans()->with('item.equip')->get();
         $announcements = \App\Models\Announcement::latest()->get();
-        return view('admin.adminDashboard',['loans'=>$loans,'announcements'=>$announcements]);
+        return view('admin.adminDashboard',['equipLoans'=>$equipLoans,'announcements'=>$announcements]);
     }
     
     public function addAnnounce()

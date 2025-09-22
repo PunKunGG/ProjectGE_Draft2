@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use App\Models\Equip;
 use App\Models\Category;
 use App\Models\Item;
@@ -24,17 +25,19 @@ class EquipController extends Controller
         $request->validate([
             'equip_name'=>'required|string',
             'category_id' => 'required|integer|exists:categories,id',
+            'prefix' => 'required|string|max:10|unique:equips,prefix',
         ]);
         Equip::create([
             'equip_name'=>$request->equip_name,
             'category_id' => $request->category_id,
+            'prefix'      => strtoupper($request->prefix),
             'add_by'=>Auth::id(),
         ]);
         return redirect()->route('admin.equip')->with('success','เพิ่มอุปกรณ์เรียบร้อยแล้ว');
     }
 
     public function edit(Equip $equip)
-    {
+    { 
          $categories = Category::orderBy('name')->get();
         return view('admin.editEquip',['equip'=>$equip,'categories'=>$categories]);
     }
@@ -44,9 +47,12 @@ class EquipController extends Controller
         $request->validate([
             'equip_name'=>'required|string',
             'category_id' => 'required|integer|exists:categories,id',
+            'prefix'      => ['required','string','max:10',
+            Rule::unique('equips')->ignore($equip->id),
+        ],
         ]);
 
-        $data = $request->only('equip_name','category_id','quantity');
+        $data = $request->only('equip_name','category_id','prefix');
 
     
     // 5. อัปเดตข้อมูลในฐานข้อมูล

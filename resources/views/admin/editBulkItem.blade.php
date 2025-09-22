@@ -21,9 +21,19 @@
                 </div>
             </div>
 
+             <form action="{{route('admin.items.bulk-edit')}}" method="GET" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="ค้นหาอุปกรณ์..." value="{{request('search')}}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i> ค้นหา
+                    </button>
+                </div>
+            </form>
+            
             {{-- 1. สร้างฟอร์มใหญ่ครอบรายการทั้งหมด --}}
             <form action="{{ route('admin.items.bulk-update') }}" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="card rounded-3 shadow-sm">
                     <div class="card-body p-0">
                         <ul class="list-group list-group-flush">
@@ -31,12 +41,14 @@
                                 <li class="list-group-item d-flex align-items-center p-3">
                                     {{-- 2. เพิ่ม Checkbox --}}
                                     <div class="me-3">
-                                        <input class="form-check-input" type="checkbox" name="item_ids[]" value="{{ $item->id }}">
+                                        <input class="form-check-input" type="checkbox" name="item_ids[]" value="{{ $item->id }}"
+                                        {{$item->status == 'Borrowed'?'disabled':''}}
+                                        >
                                     </div>
                                     <div class="flex-grow-1">
                                         <span class="fw-bold fs-5">{{ $item->asset_code }}</span>
                                         <p class="mb-1 text-muted">{{ $item->equip->equip_name }}</p>
-                                        {{-- ... Badge สถานะ ... --}}
+                                        <p class="mb-1">{{ $item->status }}</p>
                                     </div>
                                     {{-- ... Dropdown แก้ไขรายชิ้น (เหมือนเดิม) ... --}}
                                 </li>

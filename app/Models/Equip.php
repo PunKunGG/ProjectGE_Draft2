@@ -36,6 +36,7 @@ class Equip extends Model
     protected $fillable = [
         'equip_name',
         'category_id',
+        'prefix',
         'add_by',
         'remove_by',
     ];
