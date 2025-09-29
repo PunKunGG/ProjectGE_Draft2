@@ -1,5 +1,5 @@
 {{-- resources/views/auth/reset-password.blade.php --}}
-@extends('layouts.app')
+@extends('layouts.new_app')
 
 @section('content')
     <div class="container d-flex justify-content-center align-items-center bg-main" style="min-height: 80vh;">
