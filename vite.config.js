@@ -11,5 +11,5 @@ export default defineConfig({
     build: {
         outDir: 'public/build',
     },
-    base: '',   // ✅ บังคับใช้ relative path
+    base: '/build/', // 👈 สำคัญ ตรงนี้จะบังคับให้ asset ใช้ path https://domain/build/...
 });
